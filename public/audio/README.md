@@ -1,0 +1,1 @@
+The optional wedding music is an original synthesized tanpura-inspired drone in `original-tanpura-drone.wav`. It is generated locally by `scripts/createOriginalAudio.mjs`; no commercial recording is used. The player only starts when a guest presses Play.
