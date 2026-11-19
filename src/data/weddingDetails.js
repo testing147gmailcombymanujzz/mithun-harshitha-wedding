@@ -6,7 +6,8 @@ export const weddingDetails = {
     surnameStyle: '.Z',
     formalPrefix: 'Chi. Ry.',
     qualification: 'B.Com',
-    family: ['Late Smt. Muniyamma &', 'Late Sri Mayanna & Family'],
+    familyIntro: 'Son of:',
+    family: ['Smt. Kumari & Sri Lokesh'],
     address: ['No. 50, 4th Cross, CIL Colony,', 'Cholanayakanahalli, RT Nagar Post,', 'Bengaluru - 560032.'],
   },
   partner: {
@@ -35,5 +36,5 @@ export const weddingDetails = {
   footerDate: '10 & 11 December 2026 · Bengaluru',
   closingDateText: '10 & 11 December 2026',
   invocations: ['|| Sri Ganeshaya Namaha ||', '|| Sri Muneswara Swamy Prasanna ||'],
-  compliments: ['Late Smt. Muniyamma & Late Sri Mayanna', 'Late Smt. Shambhamma & Late Sri Thimmarayappa', 'Family, Relatives & Friends'],
+  compliments: ['Smt. Kumari & Sri Lokesh', 'Late Smt. Shambhamma & Late Sri Thimmarayappa', 'Family, Relatives & Friends'],
 };

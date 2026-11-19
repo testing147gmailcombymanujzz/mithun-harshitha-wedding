@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { weddingDetails } from '../data/weddingDetails.js';
+import { kannadaCopy } from '../data/kannadaCopy.js';
 
 // The ISO timestamp includes +05:30, so this instant is exact regardless of the visitor's timezone.
 const ceremonyInstant = new Date(weddingDetails.ceremonyDateTime).getTime();
@@ -29,13 +30,14 @@ export function Countdown() {
 
   return (
     <div className="save-date__countdown" role="timer" aria-label="Countdown to the wedding ceremony at 7:58 AM India Standard Time" aria-live="off">
-      {getCountdown(now).map(({ label, value }) => {
+      {getCountdown(now).map(({ label, value }, index) => {
         const displayValue = String(value).padStart(2, '0');
 
         return (
           <div className="save-date__unit" key={label}>
             <strong className="save-date__value" key={displayValue}>{displayValue}</strong>
             <span className="save-date__label">{label}</span>
+            <span className="save-date__label-kannada" lang="kn">{kannadaCopy.saveDate.countdown[index]}</span>
           </div>
         );
       })}

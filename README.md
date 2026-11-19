@@ -21,7 +21,7 @@ npm run build
 npm run preview
 ```
 
-The production site is written to `dist/`. Calendar downloads are in `public/calendar/`. The optional looping instrumental is an original, locally generated tanpura-inspired drone in `public/audio/`; it never plays until a guest presses the music control. Regenerate it with `npm run generate:audio`.
+The production site is written to `dist/`. Calendar downloads are in `public/calendar/`. The music player uses the owner-provided looping MP3 in `public/audio/wedding-instrumental.mp3` and attempts playback three seconds after the page opens. Browsers may block audible autoplay; the manual control remains available if that happens. The original generated tanpura-inspired WAV remains as an alternate asset and can be regenerated with `npm run generate:audio`.
 
 ## Project structure
 

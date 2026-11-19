@@ -5,6 +5,7 @@ import { weddingDetails } from '../data/weddingDetails.js';
 import { motion, useReducedMotion } from 'framer-motion';
 import { motionEase, sectionVariants } from '../animations/motion.js';
 import { useScrollReveal } from '../animations/useScrollReveal.js';
+import { kannadaCopy } from '../data/kannadaCopy.js';
 
 export function SaveTheDateSection() {
   const [sectionRef, isInView] = useScrollReveal();
@@ -33,21 +34,23 @@ export function SaveTheDateSection() {
       <motion.div className="save-date__content" initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
         animate={isInView || prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
         transition={{ duration: prefersReducedMotion ? 0 : 0.72, delay: prefersReducedMotion ? 0 : 0.12, ease: motionEase }}>
-          <p className="save-date__eyebrow">A day to remember</p>
-          <h2 className="save-date__title" id="save-date-title">Save the Date</h2>
+          <p className="save-date__eyebrow">A day to remember<span className="kannada-line" lang="kn">{kannadaCopy.saveDate.eyebrow}</span></p>
+          <h2 className="save-date__title" id="save-date-title">Save the Date<span className="kannada-line" lang="kn">{kannadaCopy.saveDate.title}</span></h2>
           <SectionDivider tone="ivory" />
           <p className="save-date__names">
             <span>{weddingDetails.couple.firstName}</span>
             <span className="save-date__ampersand">&amp;</span>
             <span>{weddingDetails.partner.firstName}</span>
           </p>
+          <p className="save-date__kannada-names" lang="kn">{kannadaCopy.saveDate.couple}</p>
           <figure className="save-date__portrait">
             <img src={couplePortrait} alt="Illustrated South Indian bride and groom in traditional wedding attire, framed by jasmine and flowers" />
           </figure>
           <div className="save-date__date-block">
             <p className="save-date__date">{date}</p>
-            <p className="save-date__weekday">{weekday}</p>
-            <p className="save-date__time">Muhurtham · {ceremonyTime} IST</p>
+            <p className="save-date__weekday">{weekday}<span className="kannada-line" lang="kn">{kannadaCopy.saveDate.weekday}</span></p>
+            <p className="save-date__kannada-date" lang="kn">{kannadaCopy.saveDate.date}</p>
+            <p className="save-date__time">Muhurtham · {ceremonyTime} IST<span className="kannada-line" lang="kn">{kannadaCopy.saveDate.muhurtham} · {kannadaCopy.saveDate.time}</span></p>
           </div>
           <SectionDivider tone="ivory" />
           <Countdown />

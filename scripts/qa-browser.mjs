@@ -69,7 +69,7 @@ class DevToolsPage {
       awaitPromise: true,
       userGesture: options.userGesture ?? false,
     });
-    if (result.exceptionDetails) throw new Error(result.exceptionDetails.text ?? 'Browser evaluation failed.');
+    if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description ?? result.exceptionDetails.text ?? 'Browser evaluation failed.');
     return result.result.value;
   }
 }
@@ -119,25 +119,34 @@ try {
     await page.send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile });
     await page.send('Page.navigate', { url: baseUrl });
     await new Promise((resolve) => setTimeout(resolve, 1_000));
+    console.log(`Checking viewport ${width}px`);
     const result = await page.evaluate(`(async () => {
       await Promise.race([document.fonts.ready, new Promise(resolve => setTimeout(resolve, 4000))]);
       const target = new Date('2026-12-11T07:58:00+05:30').getTime();
       const seconds = Math.max(0, Math.floor((target - Date.now()) / 1000));
       const expected = [Math.floor(seconds / 86400), Math.floor((seconds % 86400) / 3600), Math.floor((seconds % 3600) / 60), seconds % 60].map(value => String(value).padStart(2, '0'));
       const actual = [...document.querySelectorAll('.save-date__value')].map(element => element.textContent.trim());
+      const animationName = (selector, pseudo) => {
+        const element = document.querySelector(selector);
+        return element ? getComputedStyle(element, pseudo).animationName : 'missing';
+      };
       const requiredCopy = [
-        'Mithun', 'Harshitha', 'Mithun .Z', 'B.Com', 'Late Smt. Muniyamma &', 'Late Sri Mayanna & Family',
+        'Mithun', 'Harshitha', 'Mithun .Z', 'Son of:', 'Smt. Kumari & Sri Lokesh',
         'No. 50, 4th Cross, CIL Colony,', 'Cholanayakanahalli, RT Nagar Post,', 'Bengaluru - 560032.',
-        'Harshitha .M', 'B.E.', 'Daughter of:', 'Smt. Manjula & Sri Mohan Babu',
+        'Harshitha .M', 'Daughter of:', 'Smt. Manjula & Sri Mohan Babu',
         'No. 237, Sulikunte,', 'Dommasandra Post, Sarjapura Road,', 'Bengaluru - 562125.',
         'Thursday, 10 December 2026', '6:30 PM onwards', 'Friday, 11 December 2026', '7:58 AM to 8:50 AM', 'Lagna: Dhanu',
         'Samskruthi Pavilion Convention Center', 'Sulikunte, Sarjapura - Marathahalli Road,', 'Sulikunte Colony, Bengaluru - 562125.',
-        '11 December 2026', '7:58 AM IST', 'Late Smt. Muniyamma & Late Sri Mayanna',
+        '11 December 2026', '7:58 AM IST',
         'Late Smt. Shambhamma & Late Sri Thimmarayappa', 'Family, Relatives & Friends',
         'We would be honoured by your gracious presence', 'and blessings on our special day.', '10 & 11 December 2026',
+        'Every beautiful beginning deserves an invitation as special as the moment.',
+        'Want a beautiful digital invitation for your special occasion?', 'Designed with love by Manoj Kumar N',
+        'Phone: 8095828114', 'Email: manojkumarn858@gmail.com', "Let's make your special moments unforgettable.",
       ];
       const missingCopy = requiredCopy.filter(value => !document.body.innerText.includes(value));
       const overflow = [...document.querySelectorAll('body *')].filter(element => {
+        if (element.closest('.wedding-envelope')) return false;
         const rect = element.getBoundingClientRect();
         const style = getComputedStyle(element);
         return rect.width > 0 && style.position !== 'fixed' && (rect.right > innerWidth + 1 || rect.left < -1);
@@ -151,8 +160,10 @@ try {
         countdownExpectedSeconds: seconds,
         countdownActualSeconds: actual.reduce((total, value, index) => total + Number(value) * [86400, 3600, 60, 1][index], 0),
         musicPausedAtLoad: document.querySelector('#wedding-music')?.paused,
-        musicRequestedAtLoad: performance.getEntriesByType('resource').some(item => item.name.includes('original-tanpura-drone')),
-        heroNamesVisible: [...document.querySelectorAll('.hero__name')].every(element => !getComputedStyle(element).clipPath.includes('100%')),
+        autoplayAttempted: document.querySelector('#wedding-music')?.dataset.autoplayAttempted === 'true',
+        pageElapsedMs: performance.now(),
+        heroNamesVisible: [...document.querySelectorAll('.hero__name')].every(element => element.getBoundingClientRect().width > 0 && Number(getComputedStyle(element).opacity) > 0.65),
+        designerLinks: [...document.querySelectorAll('.footer__contact a')].map(anchor => anchor.getAttribute('href')),
         calendarButtons: [...document.querySelectorAll('a[download]')].map(anchor => anchor.getAttribute('href')),
         mapsHref: document.querySelector('.venue-card__directions')?.href,
         accessibility: {
@@ -164,30 +175,36 @@ try {
         },
         sectionsPresent: ['#top', '#save-the-date', '#couple', '#events', '#venue', '.closing-section'].every(selector => Boolean(document.querySelector(selector))),
         animationNames: {
-          petals: getComputedStyle(document.querySelector('.hero__petals i')).animationName,
-          floralArch: getComputedStyle(document.querySelector('.hero__artwork'), '::before').animationName,
-          dividers: getComputedStyle(document.querySelector('.section-divider span')).animationName,
-          countdown: getComputedStyle(document.querySelector('.save-date__value')).animationName,
-          sparkles: getComputedStyle(document.querySelector('.save-date__sparkles i')).animationName,
+          petals: animationName('.hero__petals i'),
+          floralArch: animationName('.hero__artwork', '::before'),
+          dividers: animationName('.section-divider span'),
+          countdown: animationName('.save-date__value'),
+          sparkles: animationName('.save-date__sparkles i'),
         },
         content: document.body.innerText,
         missingCopy,
         formalPrefixes: [...document.querySelectorAll('.person-card__honorific')].map(element => element.textContent.trim()),
+        qualifications: [...document.querySelectorAll('.person-card .qualification')].map(element => element.textContent.trim()),
+        heroDegreesPresent: Boolean(document.querySelector('.degrees')),
         resourcePayloadBytes: performance.getEntriesByType('resource').reduce((sum, item) => sum + (item.encodedBodySize || 0), 0),
         firstContentfulPaintMs: performance.getEntriesByType('paint').find(item => item.name === 'first-contentful-paint')?.startTime ?? null,
       };
     })()`);
-    console.log(JSON.stringify({ viewport: width, documentWidth: result.documentWidth, bodyWidth: result.bodyWidth, overflow: result.overflow, brokenImages: result.brokenImages, requiredFontsLoaded: result.requiredFontsLoaded, countdownExpected: result.countdownExpected, countdownActual: result.countdownActual, musicPausedAtLoad: result.musicPausedAtLoad, musicRequestedAtLoad: result.musicRequestedAtLoad, heroNamesVisible: result.heroNamesVisible, firstContentfulPaintMs: result.firstContentfulPaintMs, resourcePayloadBytes: result.resourcePayloadBytes, calendarButtons: result.calendarButtons }));
+    console.log(JSON.stringify({ viewport: width, documentWidth: result.documentWidth, bodyWidth: result.bodyWidth, overflow: result.overflow, brokenImages: result.brokenImages, requiredFontsLoaded: result.requiredFontsLoaded, countdownExpected: result.countdownExpected, countdownActual: result.countdownActual, musicPausedAtLoad: result.musicPausedAtLoad, autoplayAttempted: result.autoplayAttempted, pageElapsedMs: Math.round(result.pageElapsedMs), heroNamesVisible: result.heroNamesVisible, firstContentfulPaintMs: result.firstContentfulPaintMs, resourcePayloadBytes: result.resourcePayloadBytes, calendarButtons: result.calendarButtons }));
     assert(result.documentWidth <= width && result.bodyWidth <= width, `Horizontal overflow at ${width}px.`);
     assert(result.overflow.length === 0, `Off-canvas elements at ${width}px: ${JSON.stringify(result.overflow)}`);
     assert(result.brokenImages.length === 0, `Broken image(s) at ${width}px: ${result.brokenImages.join(', ')}`);
     assert(result.requiredFontsLoaded, `A required display, script, or body font did not load at ${width}px.`);
-    assert(result.musicPausedAtLoad === true, `Music was not paused on initial load at ${width}px.`);
-    assert(result.musicRequestedAtLoad === false, `Optional music was requested before guest interaction at ${width}px.`);
+    if (result.pageElapsedMs < 3_000) {
+      assert(result.musicPausedAtLoad === true && !result.autoplayAttempted, `Music started before the requested three-second delay at ${width}px.`);
+    }
     assert(result.heroNamesVisible, `Hero name animation did not finish after the entrance at ${width}px.`);
+    assert(JSON.stringify(result.qualifications) === JSON.stringify(['B.Com', 'B.E.']), `Couple education details are incorrect at ${width}px: ${JSON.stringify(result.qualifications)}.`);
+    assert(!result.heroDegreesPresent, `The duplicate hero degree line is still visible at ${width}px.`);
+    assert(JSON.stringify(result.designerLinks) === JSON.stringify(['tel:8095828114', 'mailto:manojkumarn858@gmail.com']), `Designer contact links are incorrect at ${width}px.`);
     assert(Math.abs(result.countdownExpectedSeconds - result.countdownActualSeconds) <= 1, `Countdown mismatch at ${width}px: ${result.countdownActual.join(':')} expected ${result.countdownExpected.join(':')}.`);
     assert(result.content.includes('Samskruthi Pavilion') && result.content.includes('Lagna: Dhanu'), `Venue or lagna details missing at ${width}px.`);
-    assert(result.content.includes('Late Smt. Muniyamma & Late Sri Mayanna') && result.content.includes('Late Smt. Shambhamma & Late Sri Thimmarayappa'), `Compliment lines missing at ${width}px.`);
+    assert(result.content.includes('Smt. Kumari & Sri Lokesh') && result.content.includes('Late Smt. Shambhamma & Late Sri Thimmarayappa'), `Compliment lines missing at ${width}px.`);
     assert(result.missingCopy.length === 0, `Supplied wedding information is missing at ${width}px: ${result.missingCopy.join(' | ')}`);
     assert(JSON.stringify(result.formalPrefixes) === JSON.stringify(['Chi. Ry.', 'Chi. Kum. Sou.']), `Formal prefixes changed in the wedding data at ${width}px.`);
     assert(result.calendarButtons.length === 4, `Expected four event calendar links at ${width}px, got ${result.calendarButtons.length}.`);
@@ -199,7 +216,7 @@ try {
     assert(result.sectionsPresent, `A required wedding section is missing at ${width}px.`);
     assert(result.animationNames.petals === 'petal-fall' && result.animationNames.floralArch === 'arch-reveal' && result.animationNames.dividers === 'divider-bloom' && result.animationNames.countdown === 'count-number-change' && result.animationNames.sparkles === 'sparkle-glow', `A decorative, divider, or countdown animation is missing at ${width}px.`);
     assert(result.firstContentfulPaintMs !== null && result.firstContentfulPaintMs < 5_000, `First contentful paint exceeded 5 seconds at ${width}px.`);
-    assert(result.resourcePayloadBytes < 600_000, `Initial page resources exceeded 600 KB at ${width}px.`);
+    assert(result.resourcePayloadBytes < 1_200_000, `Initial page resources exceeded 1.2 MB at ${width}px.`);
 
     if (width === 1920 || width === 390) {
       const screenshot = await page.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false, fromSurface: true });
@@ -207,8 +224,11 @@ try {
     }
 
     if (width === 390) {
-      const audio = await page.evaluate(`document.querySelector('#wedding-music').paused`);
-      assert(audio, 'Optional music must not autoplay.');
+      await page.evaluate(`new Promise(resolve => setTimeout(resolve, Math.max(0, 3300 - performance.now())))`);
+      const autoplayState = await page.evaluate(`({ attempted: document.querySelector('#wedding-music').dataset.autoplayAttempted === 'true', playing: !document.querySelector('#wedding-music').paused, error: document.querySelector('.music-control__label').textContent.includes('could not be played') })`);
+      console.log(`Delayed autoplay: attempted=${autoplayState.attempted}, started=${autoplayState.playing}, browserRejected=${autoplayState.error}`);
+      assert(autoplayState.attempted, 'The player did not attempt autoplay after three seconds.');
+      if (autoplayState.playing) await page.evaluate(`document.querySelector('.music-control').click()`, { userGesture: true });
       await page.evaluate(`document.querySelector('.music-control').click()`, { userGesture: true });
       await new Promise((resolve) => setTimeout(resolve, 450));
       const musicStarted = await page.evaluate(`!document.querySelector('#wedding-music').paused && document.querySelector('.music-control').getAttribute('aria-pressed') === 'true'`);
@@ -222,7 +242,7 @@ try {
 
       await page.evaluate(`window.scrollTo(0, document.body.scrollHeight)`);
       await new Promise((resolve) => setTimeout(resolve, 950));
-      const reveals = await page.evaluate(`({ sections: [...document.querySelectorAll('.motion-section')].map(node => getComputedStyle(node).opacity), closingGarlandAnimation: getComputedStyle(document.querySelector('.closing__garland')).animationName })`);
+      const reveals = await page.evaluate(`(() => { const garland = document.querySelector('.closing__garland'); return { sections: [...document.querySelectorAll('.motion-section')].map(node => getComputedStyle(node).opacity), closingGarlandAnimation: garland ? getComputedStyle(garland).animationName : 'missing' }; })()`);
       const closingShot = await page.send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false, fromSurface: true });
       await writeFile(join(screenshotsDir, 'invitation-closing-390.png'), Buffer.from(closingShot.data, 'base64'));
       assert(reveals.sections.every(opacity => Number(opacity) > 0.98), `Not all sections revealed after scrolling: ${reveals.sections.join(',')}`);
@@ -230,7 +250,7 @@ try {
     }
   }
 
-  for (const file of ['/favicon.svg', '/audio/original-tanpura-drone.wav', '/calendar/reception.ics', '/calendar/muhurtham.ics']) {
+  for (const file of ['/favicon.svg', '/audio/wedding-instrumental.mp3', '/audio/original-tanpura-drone.wav', '/calendar/reception.ics', '/calendar/muhurtham.ics']) {
     const response = await fetch(new URL(file, baseUrl));
     assert(response.ok, `${file} returned HTTP ${response.status}.`);
     console.log(`asset ${file}: HTTP ${response.status}, ${response.headers.get('content-type')}`);
@@ -253,7 +273,7 @@ try {
   await page.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
   await page.send('Page.navigate', { url: baseUrl });
   await new Promise((resolve) => setTimeout(resolve, 800));
-  const reduced = await page.evaluate(`({ garlandDuration: getComputedStyle(document.querySelector('.closing__garland')).animationDuration, scrollBehavior: getComputedStyle(document.documentElement).scrollBehavior, hiddenSection: getComputedStyle(document.querySelector('.motion-section')).opacity })`);
+  const reduced = await page.evaluate(`(() => { const garland = document.querySelector('.closing__garland'); const section = document.querySelector('.motion-section'); return { garlandDuration: garland ? getComputedStyle(garland).animationDuration : 'missing', scrollBehavior: getComputedStyle(document.documentElement).scrollBehavior, hiddenSection: section ? getComputedStyle(section).opacity : 'missing' }; })()`);
   assert(reduced.scrollBehavior === 'auto', 'Reduced-motion setting did not disable smooth scrolling.');
   assert(reduced.hiddenSection === '1', 'Reduced-motion setting left a section hidden.');
   assert(consoleErrors.length === 0, `Browser console errors: ${consoleErrors.join(' | ')}`);

@@ -1,16 +1,46 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export function MusicPlayer() {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [hasAttemptedAutoplay, setHasAttemptedAutoplay] = useState(false);
+  const wasManuallyControlled = useRef(false);
+
+  useEffect(() => {
+    const attemptAutoplay = () => {
+      const audio = audioRef.current;
+      if (!audio || wasManuallyControlled.current || !audio.paused) return;
+
+      setHasAttemptedAutoplay(true);
+      audio.volume = 0.32;
+      audio.play().then(() => setHasError(false)).catch(() => setHasError(true));
+    };
+    const startOnInteraction = (event) => {
+      if (event.target instanceof Element && event.target.closest('.music-control')) return;
+      attemptAutoplay();
+    };
+    const timeoutId = window.setTimeout(attemptAutoplay, 3_000);
+    window.addEventListener('scroll', attemptAutoplay, { once: true, passive: true });
+    window.addEventListener('pointerdown', startOnInteraction, { once: true, passive: true });
+    window.addEventListener('keydown', attemptAutoplay, { once: true });
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.removeEventListener('scroll', attemptAutoplay);
+      window.removeEventListener('pointerdown', startOnInteraction);
+      window.removeEventListener('keydown', attemptAutoplay);
+    };
+  }, []);
 
   async function togglePlayback() {
+    wasManuallyControlled.current = true;
     const audio = audioRef.current;
     if (!audio) return;
 
     if (audio.paused) {
       try {
+        audio.volume = 0.32;
         await audio.play();
         setHasError(false);
         setIsPlaying(true);
@@ -35,7 +65,8 @@ export function MusicPlayer() {
         </svg>
         <span className="music-control__label">{hasError ? 'Wedding music could not be played' : isPlaying ? 'Wedding music is playing' : 'Wedding music is paused'}</span>
       </button>
-      <audio id="wedding-music" ref={audioRef} src="/audio/original-tanpura-drone.wav" loop preload="none"
+      <audio id="wedding-music" ref={audioRef} src="/audio/wedding-instrumental.mp3" loop preload="auto" volume={0.32}
+        data-autoplay-attempted={hasAttemptedAutoplay}
         onPlay={() => setIsPlaying(true)} onPause={() => setIsPlaying(false)} onError={() => { setHasError(true); setIsPlaying(false); }} />
     </>
   );

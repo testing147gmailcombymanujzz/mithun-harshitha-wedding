@@ -4,6 +4,7 @@ import { weddingDetails } from '../data/weddingDetails.js';
 import { MotionSection } from '../components/MotionSection.jsx';
 import { motion, useReducedMotion } from 'framer-motion';
 import { motionEase } from '../animations/motion.js';
+import { kannadaCopy } from '../data/kannadaCopy.js';
 
 export function FamilySection() {
   const prefersReducedMotion = useReducedMotion();
@@ -22,14 +23,15 @@ export function FamilySection() {
       <motion.div className="closing__content" initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.99 }}
         whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.15 }}
         transition={{ duration: prefersReducedMotion ? 0 : 0.82, delay: prefersReducedMotion ? 0 : 0.1, ease: motionEase }}>
-        <p className="closing__eyebrow">With best compliments from:</p>
+        <p className="closing__eyebrow">With best compliments from:<span className="kannada-line" lang="kn">{kannadaCopy.closing.eyebrow}</span></p>
         <div className="closing__families">
-          {weddingDetails.compliments.map((line) => <p key={line}>{line}</p>)}
+          {weddingDetails.compliments.map((line, index) => <p key={line}>{line}<span className="kannada-line" lang="kn">{kannadaCopy.closing.families[index]}</span></p>)}
         </div>
         <div className="closing__ornament" aria-hidden="true"><span />✧<span /></div>
         <p className="closing__message">
           <span>We would be honoured by your gracious presence</span>
           <span>and blessings on our special day.</span>
+          <span className="kannada-line" lang="kn">{kannadaCopy.closing.message}</span>
         </p>
         <div className="closing__couple">
           <img className="closing__elephant closing__elephant--left" src={elephant} alt="" aria-hidden="true" />
@@ -37,7 +39,8 @@ export function FamilySection() {
             <h2 id="closing-title" className="closing__names">
               {weddingDetails.couple.firstName}<i>&amp;</i>{weddingDetails.partner.firstName}
             </h2>
-            <p className="closing__date">{weddingDetails.closingDateText}</p>
+            <p className="closing__names-kannada" lang="kn">{kannadaCopy.closing.couple}</p>
+            <p className="closing__date">{weddingDetails.closingDateText}<span className="kannada-line" lang="kn">{kannadaCopy.closing.date}</span></p>
           </div>
           <img className="closing__elephant closing__elephant--right" src={elephant} alt="" aria-hidden="true" />
         </div>
