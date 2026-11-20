@@ -24,12 +24,15 @@ export function MusicPlayer() {
     window.addEventListener('scroll', attemptAutoplay, { once: true, passive: true });
     window.addEventListener('pointerdown', startOnInteraction, { once: true, passive: true });
     window.addEventListener('keydown', attemptAutoplay, { once: true });
+    // Tapping the envelope seal is a user gesture, so the music can begin with it.
+    window.addEventListener('wedding:open', attemptAutoplay);
 
     return () => {
       window.clearTimeout(timeoutId);
       window.removeEventListener('scroll', attemptAutoplay);
       window.removeEventListener('pointerdown', startOnInteraction);
       window.removeEventListener('keydown', attemptAutoplay);
+      window.removeEventListener('wedding:open', attemptAutoplay);
     };
   }, []);
 

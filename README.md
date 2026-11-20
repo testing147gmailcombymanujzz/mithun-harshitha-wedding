@@ -28,10 +28,11 @@ The production site is written to `dist/`. Calendar downloads are in `public/cal
 ```text
 public/                 Static audio, calendar, favicon, and illustration files
 src/
-  animations/           Shared Framer Motion variants and Intersection Observer reveal hook
-  assets/               Imported custom SVG artwork
-  components/           Navigation, cards, countdown, music control, and shared UI
-  data/                 Central weddingDetails.js invitation copy and event data
+  art/                  All illustrations as inline React SVG (envelope, thoranam, mandap,
+                        couple avatars, lamps, kalasha, elephants), so parts can be animated
+  motion/               GSAP setup (ScrollTrigger, DrawSVG, SplitText) and shared helpers
+  components/           Envelope intro, navigation, countdown, music control, footer
+  data/                 weddingDetails.js (English) and kannadaCopy.js (Kannada)
   sections/             Hero, save date, couple, events, venue, and closing
   styles/               Global visual design system and responsive styling
   App.jsx                Top-level page composition
@@ -74,4 +75,4 @@ npm run build
 npm run preview -- --host 127.0.0.1 --port 4180
 ```
 
-In another terminal, run `node scripts/qa-browser.mjs`. It checks the seven requested desktop, tablet, and mobile widths, accessibility basics, reduced motion, assets, calendar details, and browser errors. It requires Microsoft Edge to be installed.
+In another terminal, run `node scripts/qa-browser.mjs` (note: it was written for the previous markup and its selectors need updating for the redesign). It checks the seven requested desktop, tablet, and mobile widths, accessibility basics, reduced motion, assets, calendar details, and browser errors. It requires Microsoft Edge to be installed.

@@ -4,40 +4,30 @@ import { kannadaCopy } from '../data/kannadaCopy.js';
 
 // The ISO timestamp includes +05:30, so this instant is exact regardless of the visitor's timezone.
 const ceremonyInstant = new Date(weddingDetails.ceremonyDateTime).getTime();
+const labels = ['Days', 'Hours', 'Minutes', 'Seconds'];
 
 function getCountdown(now) {
-  const totalSeconds = Math.max(0, Math.floor((ceremonyInstant - now) / 1000));
-  const days = Math.floor(totalSeconds / 86_400);
-  const hours = Math.floor((totalSeconds % 86_400) / 3_600);
-  const minutes = Math.floor((totalSeconds % 3_600) / 60);
-  const seconds = totalSeconds % 60;
-
-  return [
-    { label: 'Days', value: days },
-    { label: 'Hours', value: hours },
-    { label: 'Minutes', value: minutes },
-    { label: 'Seconds', value: seconds },
-  ];
+  const s = Math.max(0, Math.floor((ceremonyInstant - now) / 1000));
+  return [Math.floor(s / 86_400), Math.floor((s % 86_400) / 3_600), Math.floor((s % 3_600) / 60), s % 60];
 }
 
 export function Countdown() {
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    const intervalId = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(intervalId);
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
   }, []);
 
   return (
-    <div className="save-date__countdown" role="timer" aria-label="Countdown to the wedding ceremony at 7:58 AM India Standard Time" aria-live="off">
-      {getCountdown(now).map(({ label, value }, index) => {
-        const displayValue = String(value).padStart(2, '0');
-
+    <div className="sd-countdown" role="timer" aria-label="Countdown to the wedding muhurtham at 7:58 AM India Standard Time" aria-live="off">
+      {getCountdown(now).map((value, i) => {
+        const v = String(value).padStart(2, '0');
         return (
-          <div className="save-date__unit" key={label}>
-            <strong className="save-date__value" key={displayValue}>{displayValue}</strong>
-            <span className="save-date__label">{label}</span>
-            <span className="save-date__label-kannada" lang="kn">{kannadaCopy.saveDate.countdown[index]}</span>
+          <div className="count-box" key={labels[i]}>
+            <strong className="count-num" key={v}>{v}</strong>
+            <span className="count-label">{labels[i]}</span>
+            <span className="count-label-kn" lang="kn">{kannadaCopy.saveDate.countdown[i]}</span>
           </div>
         );
       })}

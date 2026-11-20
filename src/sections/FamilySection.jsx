@@ -1,50 +1,67 @@
-import garland from '../assets/hanging-garland.svg';
-import elephant from '../assets/traditional-elephant.svg';
-import { weddingDetails } from '../data/weddingDetails.js';
-import { MotionSection } from '../components/MotionSection.jsx';
-import { motion, useReducedMotion } from 'framer-motion';
-import { motionEase } from '../animations/motion.js';
-import { kannadaCopy } from '../data/kannadaCopy.js';
+import { useRef } from 'react';
+import { Corner, Elephant, Thoranam } from '../art/ornaments.jsx';
+import { weddingDetails as D } from '../data/weddingDetails.js';
+import { kannadaCopy as K } from '../data/kannadaCopy.js';
+import { gsap, growThoranam, paused, reducedMotion, replay, sway } from '../motion/gsap.js';
+import { useMotion } from '../motion/useMotion.js';
 
-export function FamilySection() {
-  const prefersReducedMotion = useReducedMotion();
+/** One line in both languages, side by side on wide screens and stacked on phones. */
+function Pair({ en, kn, className = '' }) {
+  return (
+    <div className={`pair ${className}`}>
+      <p className="pair-en">{en}</p>
+      <span className="pair-rule" aria-hidden="true" />
+      <p className="pair-kn" lang="kn">{kn}</p>
+    </div>
+  );
+}
+
+/** The green blessing section: compliments from the families, fully in English and Kannada. */
+export function FamilySection({ active }) {
+  const root = useRef(null);
+
+  useMotion(root, (el) => {
+    const q = gsap.utils.selector(el);
+    replay(q('.closing-thoranam')[0], growThoranam(q('.thoranam')[0]), 'top 95%');
+    sway(el);
+    replay(q('.closing-body')[0], paused()
+      .from(q('.closing-frame .corner path'), { drawSVG: 0, duration: 1.4, ease: 'power2.inOut' })
+      .from(q('.pair'), { y: 30, autoAlpha: 0, duration: 0.9, ease: 'power3.out', stagger: 0.12 }, 0.2)
+      .from(q('.pair-rule'), { scaleY: 0, transformOrigin: '50% 50%', duration: 0.8, ease: 'power2.out', stagger: 0.12 }, 0.5), 'top 80%');
+    replay(q('.closing-couple')[0], paused()
+      .from(q('.elephant--left'), { x: -80, autoAlpha: 0, duration: 1.3, ease: 'power3.out' })
+      .from(q('.elephant--right'), { x: 80, autoAlpha: 0, duration: 1.3, ease: 'power3.out' }, 0)
+      .from(q('.closing-names > *'), { y: 24, autoAlpha: 0, duration: 0.9, ease: 'power3.out', stagger: 0.15 }, 0.4), 'top 85%');
+    if (!reducedMotion()) {
+      gsap.to(q('.elephant-trunk'), { rotation: -8, transformOrigin: '10% 10%', duration: 1.8, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+      gsap.to(q('.elephant'), { y: -4, duration: 1.8, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+    }
+  }, active);
 
   return (
-    <MotionSection className="closing-section section section--burgundy" aria-labelledby="closing-title">
-      <div className="closing__garlands" aria-hidden="true">
-        <img className="closing__garland closing__garland--left" src={garland} alt="" />
-        <img className="closing__garland closing__garland--right" src={garland} alt="" />
+    <section ref={root} className="section closing" aria-labelledby="closing-title">
+      <div className="closing-thoranam"><Thoranam width={1400} sag={30} /></div>
+      <div className="closing-frame" aria-hidden="true">
+        <Corner className="tl" /><Corner className="tr" /><Corner className="bl" /><Corner className="br" />
       </div>
-      <div className="closing__frame" aria-hidden="true" />
-      <span className="closing__corner closing__corner--tl" aria-hidden="true">❧</span>
-      <span className="closing__corner closing__corner--tr" aria-hidden="true">❧</span>
-      <span className="closing__corner closing__corner--bl" aria-hidden="true">❧</span>
-      <span className="closing__corner closing__corner--br" aria-hidden="true">❧</span>
-      <motion.div className="closing__content" initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.99 }}
-        whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true, amount: 0.15 }}
-        transition={{ duration: prefersReducedMotion ? 0 : 0.82, delay: prefersReducedMotion ? 0 : 0.1, ease: motionEase }}>
-        <p className="closing__eyebrow">With best compliments from:<span className="kannada-line" lang="kn">{kannadaCopy.closing.eyebrow}</span></p>
-        <div className="closing__families">
-          {weddingDetails.compliments.map((line, index) => <p key={line}>{line}<span className="kannada-line" lang="kn">{kannadaCopy.closing.families[index]}</span></p>)}
-        </div>
-        <div className="closing__ornament" aria-hidden="true"><span />✧<span /></div>
-        <p className="closing__message">
-          <span>We would be honoured by your gracious presence</span>
-          <span>and blessings on our special day.</span>
-          <span className="kannada-line" lang="kn">{kannadaCopy.closing.message}</span>
-        </p>
-        <div className="closing__couple">
-          <img className="closing__elephant closing__elephant--left" src={elephant} alt="" aria-hidden="true" />
-          <div className="closing__identity">
-            <h2 id="closing-title" className="closing__names">
-              {weddingDetails.couple.firstName}<i>&amp;</i>{weddingDetails.partner.firstName}
-            </h2>
-            <p className="closing__names-kannada" lang="kn">{kannadaCopy.closing.couple}</p>
-            <p className="closing__date">{weddingDetails.closingDateText}<span className="kannada-line" lang="kn">{kannadaCopy.closing.date}</span></p>
+      <div className="section-inner closing-body">
+        <div className="closing-langs" aria-hidden="true"><span>English</span><span lang="kn">ಕನ್ನಡ</span></div>
+        <Pair className="pair--eyebrow" en="With best compliments from" kn={K.closing.eyebrow} />
+        {D.compliments.map((line, i) => <Pair key={line} className="pair--family" en={line} kn={K.closing.families[i]} />)}
+        <div className="closing-ornament" aria-hidden="true"><span />❁<span /></div>
+        <Pair className="pair--message"
+          en="We would be honoured by your gracious presence and blessings on our special day."
+          kn={K.closing.message} />
+        <div className="closing-couple">
+          <Elephant className="elephant--left" />
+          <div className="closing-names">
+            <h2 id="closing-title" className="closing-names-en">{D.couple.firstName} <i>&amp;</i> {D.partner.firstName}</h2>
+            <p className="closing-names-kn" lang="kn">{K.closing.couple}</p>
+            <p className="closing-date"><span>{D.closingDateText}</span><span lang="kn">{K.closing.date}</span></p>
           </div>
-          <img className="closing__elephant closing__elephant--right" src={elephant} alt="" aria-hidden="true" />
+          <Elephant className="elephant--right" />
         </div>
-      </motion.div>
-    </MotionSection>
+      </div>
+    </section>
   );
 }
