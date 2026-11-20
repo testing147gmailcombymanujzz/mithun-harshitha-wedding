@@ -119,10 +119,7 @@ export function EnvelopeIntro({ onLeaving, onEnter }) {
 
       <header className="intro-heading">
         <p className="intro-kicker"><span lang="kn">{K.shubhaVivaha}</span><span>Shubha Vivaha</span></p>
-        <h1 id="intro-title" className="intro-names">
-          <span className="intro-names-kn" lang="kn">{K.hero.couple}</span>
-          <span className="intro-names-en">{D.couple.firstName} <i>&amp;</i> {D.partner.firstName}</span>
-        </h1>
+        <h1 id="intro-title" className="sr-only">{D.couple.firstName} &amp; {D.partner.firstName} wedding invitation</h1>
       </header>
 
       <div className="stage">
@@ -153,9 +150,9 @@ export function EnvelopeIntro({ onLeaving, onEnter }) {
       </div>
 
       <p className="intro-hint">
+        <span className="intro-hint-hand" aria-hidden="true">☝</span>
         <span lang="kn">{K.intro.instruction}</span>
         <span>Tap the seal to open</span>
-        <span className="intro-hint-hand" aria-hidden="true">☝</span>
       </p>
 
       <div className="intro-enter" aria-live="polite">
