@@ -208,27 +208,3 @@ export function PetalShape({ rose = false }) {
     </svg>
   );
 }
-
-/** Simple decorated elephant facing right, its trunk on its own group so it can swing. */
-export function Elephant({ className = '' }) {
-  return (
-    <svg className={`elephant ${className}`} viewBox="0 0 220 170" aria-hidden="true">
-      <g className="elephant-body">
-        <path d="M34 90 C26 100 26 112 30 122" stroke="url(#g-gold)" strokeWidth="3" fill="none" strokeLinecap="round" />
-        {[46, 72, 108, 134].map((x, i) => <rect key={x} x={x} y="108" width="20" height="46" rx="7" fill={i % 2 ? '#d8b878' : 'url(#g-gold)'} />)}
-        <ellipse cx="96" cy="92" rx="64" ry="42" fill="url(#g-gold)" />
-        <circle cx="160" cy="78" r="32" fill="url(#g-gold)" />
-        <path d="M148 58 C128 60 126 104 146 108 C158 104 160 70 148 58Z" fill="#c29a5a" />
-        <path d="M58 58 C82 50 120 50 138 58 L132 106 C112 114 86 114 64 106Z" fill={MAROON} stroke="#f3dca4" strokeWidth="2" />
-        <path d="M64 96 C86 104 112 104 133 96" stroke="#f3dca4" strokeWidth="1.2" fill="none" strokeDasharray="1 4" strokeLinecap="round" />
-        {[78, 98, 118].map((x) => <circle key={x} cx={x} cy={80} r="3.5" fill="#f3dca4" />)}
-        <path d="M160 46 C168 52 172 62 168 70 C162 66 158 56 160 46Z" fill={MAROON} stroke="#f3dca4" strokeWidth="1.2" />
-        <circle cx="170" cy="72" r="2.6" fill="#3a2a1c" />
-      </g>
-      <g className="elephant-trunk">
-        <path d="M182 88 C200 104 202 132 190 150 C186 156 178 154 180 147 C188 132 186 114 170 102Z" fill="url(#g-gold)" />
-        <path d="M176 100 C186 110 194 110 202 102" stroke="#fffaf0" strokeWidth="4" strokeLinecap="round" fill="none" />
-      </g>
-    </svg>
-  );
-}

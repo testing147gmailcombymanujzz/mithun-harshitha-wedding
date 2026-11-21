@@ -3,7 +3,7 @@
  * the seal plays one GSAP timeline: the seal is pressed and lifts away, the flap folds
  * back in 3D, the invitation card slides out while the envelope sinks, the envelope
  * falls away and the card comes forward in a shower of marigold petals. Then the
- * guest enters the site (or it continues on its own after a moment).
+ * guest enters the site with a tap or another scroll (or it continues on its own).
  */
 import { useEffect, useRef, useState } from 'react';
 import { weddingDetails as D } from '../data/weddingDetails.js';
@@ -19,6 +19,8 @@ export function EnvelopeIntro({ onLeaving, onEnter }) {
   const [opened, setOpened] = useState(false);
   const [ready, setReady] = useState(false);
   const leaving = useRef(false);
+  const stage = useRef({ opened: false, ready: false });
+  stage.current = { opened, ready };
 
   useEffect(() => {
     const previous = document.body.style.overflow;
@@ -49,6 +51,7 @@ export function EnvelopeIntro({ onLeaving, onEnter }) {
         .to(q('.seal svg'), { scale: 1.07, duration: 0.5, ease: 'sine.inOut' })
         .to(q('.seal svg'), { scale: 1, duration: 0.6, ease: 'sine.inOut' });
       gsap.to(q('.intro-hint-hand'), { y: 5, duration: 0.9, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+      gsap.to(q('.intro-scroll-note svg'), { y: 5, duration: 0.8, ease: 'sine.inOut', yoyo: true, repeat: -1 });
     }
 
     const cardScale = () => {
@@ -83,6 +86,45 @@ export function EnvelopeIntro({ onLeaving, onEnter }) {
       .fromTo(q('.intro-enter'), { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 3.5)
       .call(() => setReady(true));
   });
+
+  // Scrolling or swiping down does what a tap does: the first gesture opens the
+  // envelope, a fresh gesture once the card is out enters the site. Wheel momentum
+  // from the first gesture is ignored: only a wheel event after a short pause counts.
+  useEffect(() => {
+    let lastWheel = 0;
+    let touchY = null;
+    let touchUsed = false;
+    const act = () => {
+      if (!stage.current.opened) open();
+      else if (stage.current.ready) enter();
+    };
+    const onWheel = (e) => {
+      const now = performance.now();
+      const fresh = now - lastWheel > 450;
+      lastWheel = now;
+      if (fresh && e.deltaY > 4) act();
+    };
+    const onTouchStart = (e) => { touchY = e.touches[0].clientY; touchUsed = false; };
+    const onTouchMove = (e) => {
+      if (touchY == null || touchUsed) return;
+      if (touchY - e.touches[0].clientY > 40) { touchUsed = true; act(); }
+    };
+    const onKey = (e) => {
+      if (['ArrowDown', 'PageDown', ' '].includes(e.key) && !e.target.closest?.('button')) { e.preventDefault(); act(); }
+    };
+    window.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('keydown', onKey);
+    };
+    // open/enter only read refs and stable setters.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Once open, the site follows on its own after a pause, unless the guest taps first.
   useEffect(() => {
@@ -143,7 +185,7 @@ export function EnvelopeIntro({ onLeaving, onEnter }) {
             <div className="flap-face flap-back"><FlapBack /></div>
           </div>
           <button className="env-part seal" type="button" onClick={open} disabled={opened}
-            aria-label="Tap the seal to open the wedding invitation">
+            aria-label="Tap the seal, or scroll down, to open the wedding invitation">
             <Seal initials={[D.couple.firstInitial, D.partner.firstInitial]} />
           </button>
         </div>
@@ -152,7 +194,7 @@ export function EnvelopeIntro({ onLeaving, onEnter }) {
       <p className="intro-hint">
         <span className="intro-hint-hand" aria-hidden="true">☝</span>
         <span lang="kn">{K.intro.instruction}</span>
-        <span>Tap the seal to open</span>
+        <span>Tap the seal or scroll to open</span>
       </p>
 
       <div className="intro-enter" aria-live="polite">
@@ -160,6 +202,11 @@ export function EnvelopeIntro({ onLeaving, onEnter }) {
         <button type="button" onClick={enter} disabled={!ready}>
           <span>Enter the invitation</span><small lang="kn">{K.intro.enter}</small>
         </button>
+        <p className="intro-scroll-note">
+          <span>Scroll down or tap to enter</span>
+          <span lang="kn">{K.intro.scrollToEnter}</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 L12 12 L18 6" /><path d="M6 12 L12 18 L18 12" /></svg>
+        </p>
       </div>
     </section>
   );

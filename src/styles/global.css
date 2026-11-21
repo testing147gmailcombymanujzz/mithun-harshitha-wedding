@@ -189,7 +189,7 @@ address { font-style: normal; }
 .intro-kicker { display: flex; flex-direction: column; align-items: center; color: var(--maroon); }
 .intro-kicker [lang='kn'] { font-size: clamp(1.3rem, 2.6vw, 1.8rem); line-height: 1.5; }
 .intro-kicker span:last-child { color: var(--ink-soft); font: 600 .68rem/1.5 var(--sans); letter-spacing: .34em; text-transform: uppercase; }
-.card-names i, .hero-names-en i, .sd-names-en i, .closing-names-en i { color: var(--gold); font-style: normal; font-size: .7em; }
+.card-names i, .hero-names-en i, .sd-names-en i { color: var(--gold); font-style: normal; font-size: .7em; }
 
 .stage { position: relative; z-index: 4; }
 
@@ -260,10 +260,10 @@ address { font-style: normal; }
 .card-dot { color: var(--gold); letter-spacing: 0; }
 .card-names-kn { color: var(--maroon); font-size: 4.2cqw; line-height: 1.5; }
 .card-names { color: var(--leaf); font: 400 8cqw/1 var(--script); }
-.card-rule, .closing-ornament { display: flex; align-items: center; justify-content: center; gap: .8em; color: var(--gold); }
+.card-rule { display: flex; align-items: center; justify-content: center; gap: .8em; color: var(--gold); }
 .card-rule { font-size: 2.6cqw; }
-.card-rule span, .closing-ornament span span { width: 12cqw; height: 1px; background: linear-gradient(90deg, transparent, currentColor); }
-.card-rule span:last-child, .closing-ornament span:last-child span:last-child { transform: scaleX(-1); }
+.card-rule span { width: 12cqw; height: 1px; background: linear-gradient(90deg, transparent, currentColor); }
+.card-rule span:last-child { transform: scaleX(-1); }
 .card-date { display: flex; flex-direction: column; color: var(--maroon); font-size: 3cqw; font-weight: 600; line-height: 1.35; }
 .card-date [lang='kn'] { font-size: 2.6cqw; }
 .card-city { color: var(--ink-soft); font: 600 1.9cqw/1.6 var(--sans); letter-spacing: .2em; text-transform: uppercase; }
@@ -319,6 +319,10 @@ address { font-style: normal; }
   text-transform: uppercase;
   cursor: pointer;
 }
+.intro-scroll-note { display: flex; flex-direction: column; align-items: center; color: var(--ink); text-align: center; }
+.intro-scroll-note span:first-child { font: 700 .62rem/1.5 var(--sans); letter-spacing: .22em; text-transform: uppercase; }
+.intro-scroll-note [lang='kn'] { color: var(--maroon); font-size: .9rem; font-weight: 600; line-height: 1.6; }
+.intro-scroll-note svg { width: 20px; height: 20px; fill: none; stroke: var(--gold-deep); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .intro-enter button small { margin-top: .15rem; font-size: .82rem; line-height: 1.5; }
 
 /* ------------------------------------------------------------------ hero */
@@ -535,73 +539,7 @@ address { font-style: normal; }
 .venue-address p { display: flex; flex-direction: column; line-height: 1.55; }
 .venue-address [lang='kn'] { font-size: .95rem; line-height: 1.85; padding-right: clamp(1rem, 4vw, 3rem); border-right: 1px solid rgb(198 163 106 / 60%); }
 .venue-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .8rem; margin-top: 2rem; }
-
-/* ------------------------------------------------------------------ closing (green) */
-
-.closing {
-  padding-top: clamp(8rem, 13vw, 11rem);
-  color: #f5f0e5;
-  background:
-    radial-gradient(ellipse at 50% 46%, rgb(57 104 77 / 34%), transparent 62%),
-    radial-gradient(ellipse at 50% 0%, rgb(198 163 106 / 14%), transparent 48%),
-    radial-gradient(rgb(222 197 139 / 10%) .7px, transparent .7px),
-    linear-gradient(135deg, #102a25, #183a30 52%, #102b25);
-  background-size: auto, auto, 10px 10px, auto;
-}
-.closing-thoranam { position: absolute; inset: 0 0 auto; z-index: 2; height: clamp(90px, 10vw, 140px); pointer-events: none; }
-.closing-frame { position: absolute; inset: 0; pointer-events: none; }
-.closing-frame::before { content: ''; position: absolute; inset: 14px; border: 1px solid rgb(222 197 139 / 60%); }
-.closing .corner { color: #dec58b; }
-
-.closing-body { max-width: 1100px; }
-.closing-langs { display: grid; grid-template-columns: 1fr 1px 1fr; gap: clamp(1rem, 4vw, 3rem); margin-bottom: 1.4rem; color: rgb(222 197 139 / 75%); font: 700 .6rem/1.5 var(--sans); letter-spacing: .3em; text-transform: uppercase; }
-.closing-langs span:first-child { grid-column: 1; text-align: right; }
-.closing-langs span:last-child { grid-column: 3; text-align: left; font-size: .8rem; }
-
-.pair { display: grid; grid-template-columns: 1fr 1px 1fr; align-items: center; gap: clamp(1rem, 4vw, 3rem); margin: .45rem 0; }
-.pair-en { text-align: right; }
-.pair-kn { text-align: left; }
-.pair-rule { align-self: stretch; width: 1px; background: linear-gradient(180deg, transparent, rgb(222 197 139 / 70%), transparent); }
-.pair--eyebrow { margin-bottom: 1rem; color: #dec58b; }
-.pair--eyebrow .pair-en { font: 700 .74rem/1.5 var(--sans); letter-spacing: .22em; text-transform: uppercase; }
-.pair--eyebrow .pair-kn { font-size: 1.05rem; }
-.pair--family .pair-en { font-size: clamp(1.2rem, 2.2vw, 1.6rem); font-weight: 600; line-height: 1.35; }
-.pair--family .pair-kn { color: #f0e3c4; font-size: clamp(1rem, 1.8vw, 1.25rem); line-height: 1.7; }
-.pair--message .pair-en { font-size: clamp(1.1rem, 2vw, 1.4rem); font-style: italic; line-height: 1.55; }
-.pair--message .pair-kn { color: #f0e3c4; font-size: clamp(.98rem, 1.7vw, 1.15rem); line-height: 1.85; }
-.closing-ornament { margin: 1.6rem auto 1.2rem; color: #dec58b; font-size: 1.2rem; }
-.closing-ornament span { width: clamp(60px, 10vw, 120px); }
-
-.closing-couple { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: clamp(.5rem, 3vw, 2rem); margin-top: 2.4rem; }
-.elephant { width: 100%; max-width: 210px; height: auto; overflow: visible; }
-.elephant--left { justify-self: end; }
-.elephant--right { justify-self: start; transform: scaleX(-1); }
-.closing-names { display: flex; flex-direction: column; align-items: center; }
-.closing-names-en { color: #f5f0e5; font: 400 clamp(3rem, 6vw, 4.6rem)/1.15 var(--script); }
-.closing-names-kn { color: #dec58b; font-size: clamp(1.3rem, 2.6vw, 1.9rem); line-height: 1.5; }
-.closing-date { display: flex; flex-direction: column; margin-top: .6rem; color: #dec58b; font: 700 .74rem/1.5 var(--sans); letter-spacing: .22em; text-transform: uppercase; }
-.closing-date [lang='kn'] { font-size: .95rem; line-height: 1.7; }
-
-/* ------------------------------------------------------------------ footer */
-
-.footer {
-  padding: clamp(2.8rem, 6vw, 4rem) var(--gutter) clamp(5.5rem, 8vw, 4.5rem);
-  color: #f3e9d8;
-  text-align: center;
-  background: linear-gradient(180deg, var(--maroon-deep), #33091a);
-  border-top: 1px solid rgb(198 163 106 / 35%);
-}
-.footer p { margin: 0 auto; }
-.footer-quote { max-width: 34rem; color: var(--ivory); font-size: clamp(1.15rem, 2.2vw, 1.4rem); font-style: italic; line-height: 1.5; text-wrap: balance; }
-.footer-rule { display: flex; align-items: center; justify-content: center; gap: .8rem; margin: 1.2rem auto 1rem; color: var(--gold); }
-.footer-rule span { width: 56px; height: 1px; background: linear-gradient(90deg, transparent, currentColor); }
-.footer-rule span:last-child { transform: scaleX(-1); }
-.footer-credit { color: #e6d8c2; font: 500 .9rem/1.6 var(--sans); letter-spacing: .03em; }
-.footer-credit b { color: var(--gold-light); font-weight: 700; }
-.footer-contact { display: flex; flex-wrap: wrap; justify-content: center; gap: .2rem .6rem; margin-top: .3rem !important; font: 500 .9rem/1.6 var(--sans); }
-.footer-contact span { color: var(--gold); }
-.footer-contact a { color: var(--gold-light); text-decoration: none; }
-.footer-contact a:hover { text-decoration: underline; }
+.venue { padding-bottom: calc(var(--section-y) + 2rem); }
 
 /* ------------------------------------------------------------------ music */
 
@@ -629,15 +567,6 @@ address { font-style: normal; }
   .venue-address { grid-template-columns: 1fr; }
   .venue-address [lang='kn'] { padding: 0 0 1rem; border-right: 0; border-bottom: 1px solid rgb(198 163 106 / 60%); }
 
-  /* On phones each bilingual pair stacks, English over Kannada, at the same weight. */
-  .closing-langs { display: none; }
-  .pair { grid-template-columns: 1fr; gap: .15rem; margin: .9rem 0; }
-  .pair-en, .pair-kn { text-align: center; }
-  .pair-rule { display: none; }
-  .closing-couple { grid-template-columns: 1fr 1fr; }
-  .closing-names { grid-column: 1 / -1; grid-row: 1; }
-  .elephant { max-width: 130px; }
-  .elephant--left { justify-self: center; } .elephant--right { justify-self: center; }
   .sd-side { min-width: 6rem; letter-spacing: .14em; }
 }
 

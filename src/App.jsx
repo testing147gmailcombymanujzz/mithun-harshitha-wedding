@@ -3,11 +3,9 @@ import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 import { Defs } from './art/Defs.jsx';
 import { EnvelopeIntro } from './components/EnvelopeIntro.jsx';
-import { Footer } from './components/Footer.jsx';
 import { MusicPlayer } from './components/MusicPlayer.jsx';
 import { CoupleSection } from './sections/CoupleSection.jsx';
 import { EventsSection } from './sections/EventsSection.jsx';
-import { FamilySection } from './sections/FamilySection.jsx';
 import { HeroSection } from './sections/HeroSection.jsx';
 import { SaveTheDateSection } from './sections/SaveTheDateSection.jsx';
 import { VenueSection } from './sections/VenueSection.jsx';
@@ -60,9 +58,7 @@ export default function App() {
           <CoupleSection active={active} />
           <EventsSection active={active} />
           <VenueSection active={active} />
-          <FamilySection active={active} />
         </main>
-        <Footer />
       </div>
       <MusicPlayer />
     </>
